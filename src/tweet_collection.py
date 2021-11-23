@@ -74,15 +74,15 @@ def main():
     
     query_params = {'query': 'from:twitterdev',
                     'tweet.fields': 'public_metrics,created_at,lang', 
-                    'expansions': 'geo.place_id',
-                    'place.fields': 'contained_within,country,country_code,full_name,geo,id,name,place_type',
                     'max_results': 10}
-                    #'since_id':}
+                    #todo: 'since_id'
+                    #todo: figure out how to bound for tweets in the north american timezones 
     
     json_response = connect_to_endpoint(search_url, query_params)
-    print(json.dumps(json_response, indent=4, sort_keys=True))
-
+    print(json.dumps(json_response, indent=4, sort_keys=True)) # prints tweets to output 
     
+    #todo: save tweets to file 
+
     
 if __name__ == '__main__':
     main()
