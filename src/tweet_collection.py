@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 #!/usr/bin/env python3
 
 __authors__ = ['Nathalie Redick', 'Gabriela Rueda', 'Yusen Tang']
@@ -159,4 +157,3 @@ def main():
         
 if __name__ == '__main__':
     main()
->>>>>>> nathalie
