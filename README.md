@@ -11,15 +11,15 @@ Tweet data collected by _tweet_collection.py_ is stored in a json file, and each
 
 ## Usage 
 
-*Clone this repository.*
+**Clone this repository.**
 
-*Install requirements:* 
+**Install requirements:** 
 
 ```
 pip install -r requirements.txt
 ```
 
-*Environment Variable Set-Up:* 
+**Environment Variable Set-Up:** 
 Environment variables are handled by _[python-dotenv](https://pypi.org/project/python-dotenv/)_
 
 A Twitter Developer Account with Elevated access is necessary to run the code. The API key and API key secret should be stored in a _.env_ file (see _.env_template_).
@@ -33,7 +33,7 @@ options:
   -o OUTPUT_PATH   <output.json> (optional)
 ```
 
-*Example Usage:* (from root)
+**Example Usage:** (from root)
 
 ```
 python3 src/tweet_collection.py -k data/keywords.csv -o data/tweets.json
