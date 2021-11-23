@@ -13,8 +13,7 @@ __date__ = '22 November 2021'
 '''
 
 ## imports 
-import argparse, os, sys, json, datetime, re, tweepy, random, csv
-from tqdm import tqdm
+import argparse, os, sys, json, re, tweepy, random, csv
 import os.path as osp
 from dotenv import load_dotenv
 from pathlib import Path
