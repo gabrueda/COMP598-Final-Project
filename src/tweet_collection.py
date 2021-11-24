@@ -109,9 +109,10 @@ def main():
         while i < 1000: 
             keys, query = build_query(keywords)
             print(f'Searching with keywords : {keys}')
-            tweets = tweepy.Cursor(api.search_tweets, q=query, lang='en', result_type='mixed', tweet_mode='extended').items() 
-            
-            for tweet in tweets:
+            # only get 250 tweets at a time, prevents us from hitting the rate limit too quickly 
+            tweets = tweepy.Cursor(api.search_tweets, q=query, lang='en', result_type='mixed', tweet_mode='extended', count=250).items() 
+
+            for j, tweet in enumerate(tweets):
                 location = get_location(tweet)
                 if location: # only grab tweets that have a valid location aka are in canada 
                     t = {} # dict to hold tweet info 
@@ -147,8 +148,8 @@ def main():
                             
                         out.write(json.dumps(t)+'\n')
                     
-                    if i == 100: # 100 tweets for each 10 randomly selected keywords 
-                        break # out of for loop, not while
+                        if j >= 250: # max of 250 tweets for each 10 randomly selected keywords 
+                            break # out of for loop, not while
                     
             time.sleep(2) # wait 2 seconds before next request
                     
