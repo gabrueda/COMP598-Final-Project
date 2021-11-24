@@ -48,10 +48,10 @@ The file _tweet_collection.py_ collects 1000 unique tweets, which can take a whi
 ├── COMP 598 Final Project - Data Science Project.pdf
 ├── README.md
 ├── data
-│   ├── keywords-quoted.csv
-│   ├── keywords.csv
-│   ├── tweets.json
-│   └── tweets2.json
+│   ├── keywords-quoted.csv
+│   ├── keywords.csv
+│   ├── tweets-1.json
+│   └── tweets-2.json
 ├── requirements.txt
 └── src
     └── tweet_collection.py
