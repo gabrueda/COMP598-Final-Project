@@ -46,7 +46,7 @@ def main():
      
     # pick one of the files at random for the last tweet 
     f = random.sample(input_files, 1)  
-    samples.append(sample_tweets(*f, 1))
+    samples.append(sample_tweets(*f, 2))
     
     flattened = list(itertools.chain(*samples))
     print(len(flattened))
