@@ -47,7 +47,7 @@ The file _tweet_collection.py_ collects 1000 unique tweets, which can take a whi
 ### json_to_csv.py
 
 This script will convert a json file (with a json object in each line) into a csv file.
-This script assumes there is an 'id', 'topic' and 'sentiment' field for each record.
+This script assumes the fields '['id', 'text', 'topic', 'sentiment', 'created_at', 'retweet'] are present for each record.
 ```
 usage: json_to_csv.py -i INPUT_PATH -o OUTPUT_PATH
 
