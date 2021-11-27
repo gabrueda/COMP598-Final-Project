@@ -72,10 +72,10 @@ def collect_tweets(keywords, output_path, date):
     i = 0                   # count the number of valid tweets 
     used_tweets = []        # used to check if a tweet is unique
     
+    keys, query = build_query(keywords)
+    print(f'Searching with keywords : {keys}')
+    
     while i < 1000:
-        keys, query = build_query(keywords)
-        print(f'Searching with keywords : {keys}')
-
         for tweet in tweepy.Cursor(api.search_tweets, q=query, lang='en', 
                                     result_type='recent', tweet_mode='extended',
                                     until=date[0]).items():
@@ -103,10 +103,12 @@ def collect_tweets(keywords, output_path, date):
 
             # get different keywords for each 250 tweets collected
             if i % 250 == 0 and i != 0:
+                keys, query = build_query(keywords)
+                print(f'Searching with keywords : {keys}')
                 break
             
             if i == 1000:
-                break 
+                break
         
 # builds a query string (word OR word OR...) by randomly selecting 10 keywords from the keywords file
 def build_query(keywords):
