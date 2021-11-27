@@ -22,6 +22,9 @@ pip install -r requirements.txt
 **Environment Variable Set-Up:** 
 Environment variables are handled by _[python-dotenv](https://pypi.org/project/python-dotenv/)_
 
+## Scripts
+
+### tweet_collection.py
 A Twitter Developer Account with Elevated access is necessary to run the code. The API key and API key secret should be stored in a _.env_ file (see _.env_template_).
 
 ```
@@ -40,6 +43,24 @@ python3 src/tweet_collection.py -k data/keywords.csv -o data/tweets.json
 ```
 
 The file _tweet_collection.py_ collects 1000 unique tweets, which can take a while due to the Twitter API's rate limit. It will sleep automatically and continue collecting tweets until it reaches 1000 tweets.
+
+### json_to_csv.py
+
+This script will convert a json file (with a json object in each line) into a csv file.
+This script assumes there is an 'id', 'topic' and 'sentiment' field for each record.
+```
+usage: json_to_csv.py -i INPUT_PATH -o OUTPUT_PATH
+
+options:
+  -I INPUT_PATH  <data.json>
+  -o OUTPUT_PATH   <data.csv>
+```
+
+**Example Usage:** (from root)
+
+```
+python3 src/json_to_csv.py -i data/sampled.json -o data/sampled.csv
+```
 
 ## Repository Structure
 
