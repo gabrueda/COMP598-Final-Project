@@ -42,7 +42,8 @@ def main():
     keywords = get_keywords(keyword_path)
 
     # collect tweets
-    collect_tweets(keywords, output_path, date)
+    used_tweets = []        # used to check if a tweet is unique
+    tweet_collection(keywords, output_path, date, used_tweets)
 
 ## helper functions 
 
@@ -50,7 +51,7 @@ def main():
 def parse_arguments():
     parser = argparse.ArgumentParser()  
     parser.add_argument('-k', '--keywords_path', help='<keywords.csv> (optional)', default=None)
-    parser.add_argument('-o', '--output_file_path', help='<output.json> (optional)', default=['data/output.json'])
+    parser.add_argument('-o', '--output_file_path', help='<output.json> (optional)', default='data/output.json')
     parser.add_argument('-d', '--date', nargs=2, help='2021-11-25 Nov 24', default=['2021-11-25', 'Nov 25'])
     return parser.parse_args()
 
@@ -64,20 +65,23 @@ def get_keywords(keyword_path):
         return ['covid', 'covid-19', 'pfizer', 'moderna', 'astrazeneca', 'janssen', 'johnson & johnson', 
                     'vaccination', 'vaccine', 'coronavirus', 'sars-cov-2']
 
-def collect_tweets(keywords, output_path, date):
+def tweet_collection(keywords, output_path, date, used_tweets):
+    try:
+        collect_tweets(keywords, output_path, date, used_tweets, len(used_tweets))
+    except:
+        tweet_collection(keywords, output_path, date, used_tweets)
+
+def collect_tweets(keywords, output_path, date, used_tweets, index):
     # authenticate 
     auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
     api = tweepy.API(auth, wait_on_rate_limit=True)
-
-    i = 0                   # count the number of valid tweets 
-    used_tweets = []        # used to check if a tweet is unique
     
     keys, query = build_query(keywords)
     print(f'Searching with keywords : {keys}')
 
     for tweet in tweepy.Cursor(api.search_tweets, q=query, lang='en', 
                                     tweet_mode='extended', until=date[0]).items():
-        # check if tweet has valid location
+        # check if tweet has valid location and date
         location = get_location(tweet)
         date_tweet = tweet._json['created_at']
         if location and  date[1] in date_tweet:
@@ -97,10 +101,10 @@ def collect_tweets(keywords, output_path, date):
                     out.write(json.dumps(t)+'\n')               # write a tweet to output file 
                         
                 used_tweets.append(hash(text))
-                i += 1
-                print(i)
+                index += 1
+                print(index)
         
-        if i == 1000:
+        if index == 1000:
             break 
         
 # builds a query string (word OR word OR...) by randomly selecting 10 keywords from the keywords file
