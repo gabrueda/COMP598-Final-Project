@@ -22,8 +22,6 @@ def load_json(input_file):
     for line in lines:
         record = json.loads(line)
         record['link'] = 'https://twitter.com/twitter/statuses/' + str(record['id'])
-        record['topic'] = ''
-        record['sentiment'] = ''
         data.append(record)
 
     return pandas.DataFrame(data)
