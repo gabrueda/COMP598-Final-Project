@@ -21,9 +21,7 @@ from pathlib import Path
 parentdir = Path(__file__).parents[1]
 sys.path.append(parentdir)
 
-
 ## global variables 
-
 # set up env variables using dotenv 
 load_dotenv()
 env_path = osp.join(parentdir, '.env')
@@ -33,14 +31,86 @@ load_dotenv(dotenv_path=env_path)
 API_KEY = os.getenv('API_KEY')
 API_KEY_SECRET = os.getenv('API_KEY_SECRET')
 
+def main():
+    # parse arguments
+    args = parse_arguments()
+    keyword_path = args.keywords_path
+    output_path = args.output_file_path
+    date = args.date
+    
+    # get keywords for search
+    keywords = get_keywords(keyword_path)
+
+    # collect tweets
+    used_tweets = []        # used to check if a tweet is unique
+    tweet_collection(keywords, output_path, date, used_tweets)
 
 ## helper functions 
 
+# parse arguments
+def parse_arguments():
+    parser = argparse.ArgumentParser()  
+    parser.add_argument('-k', '--keywords_path', help='<keywords.csv> (optional)', default=None)
+    parser.add_argument('-o', '--output_file_path', help='<output.json> (optional)', default='data/output.json')
+    parser.add_argument('-d', '--date', nargs=2, help='2021-11-25 Nov 24', default=['2021-11-25', 'Nov 25'])
+    return parser.parse_args()
+
+# get keywords file or use default keywords 
+def get_keywords(keyword_path):
+    try:
+        with open(keyword_path, 'r') as f:
+            return [word.rstrip('\n') for word in f.readlines()]
+    except: 
+        print(f'Warning: Cannot find keywords file or no filepath given, using default keywords instead.')
+        return ['covid', 'covid-19', 'pfizer', 'moderna', 'astrazeneca', 'janssen', 'johnson & johnson', 
+                    'vaccination', 'vaccine', 'coronavirus', 'sars-cov-2']
+
+def tweet_collection(keywords, output_path, date, used_tweets):
+    try:
+        collect_tweets(keywords, output_path, date, used_tweets, len(used_tweets))
+    except:
+        tweet_collection(keywords, output_path, date, used_tweets)
+
+def collect_tweets(keywords, output_path, date, used_tweets, index):
+    # authenticate 
+    auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
+    api = tweepy.API(auth, wait_on_rate_limit=True)
+    
+    keys, query = build_query(keywords)
+    print(f'Searching with keywords : {keys}')
+
+    for tweet in tweepy.Cursor(api.search_tweets, q=query, lang='en', 
+                                    tweet_mode='extended', until=date[0]).items():
+        # check if tweet has valid location and date
+        location = get_location(tweet)
+        date_tweet = tweet._json['created_at']
+        if location and  date[1] in date_tweet:
+            text = full_text(tweet).replace('\n', '\t')
+            if hash(text) not in used_tweets:
+                t = {}                                          # dict to hold tweet info 
+                t['id'] = tweet._json['id']
+                t['text'] = text                                
+                t['created_at'] = tweet._json['created_at']
+                t['topic'] = '<TOPIC>'
+                t['sentiment'] = '<SENTIMENT>'
+                t['retweet'] = True if 'retweeted_status' in tweet._json else False
+                t['url'] = 'https://twitter.com/twitter/statuses/' + str(t['id'])
+                t['location'] = location
+
+                with open(output_path, 'a+') as out:
+                    out.write(json.dumps(t)+'\n')               # write a tweet to output file 
+                        
+                used_tweets.append(hash(text))
+                index += 1
+                print(index)
+        
+        if index == 1000:
+            break 
+        
 # builds a query string (word OR word OR...) by randomly selecting 10 keywords from the keywords file
 def build_query(keywords):
     words = random.sample(keywords, 10) # api docs recommend using 10 keywords 
     return words, ' OR '.join(words) 
-
 
 # get the tweet text 
 def full_text(tweet):
@@ -50,96 +120,24 @@ def full_text(tweet):
         text = tweet.full_text
     return text
 
+# get tweet with valid location
+def get_location(tweet):
+    # get location
+    if tweet._json['place']:
+        if tweet._json['place']['country'] == 'Canada':
+            return tweet._json['place']['full_name'].lower()
+   
+    locations = ['Canada', 'Ottawa', 'Alberta', 'Edmonton', 'British Columbia', 'Vancouver', 'Manitoba', 'New Brunswick', 
+                'Fredericton', 'Newfoundland and Labrador', 'Nova Scotia', 'Ontario', 'Prince Edward Island', 'Quebec', 
+                'Saskatchewan', 'Regina', 'Northwest Territories','Nunavut', 'Iqaluit', 'Yukon']
 
-def main():
-    # argparse
-    parser = argparse.ArgumentParser()  
-    parser.add_argument('-k', nargs=1, dest='keyword_path', help='<keywords.csv> (optional)')
-    parser.add_argument('-o', nargs=1, dest='output_path', help='<output.json> (optional)', default=['data/output.json'])
-    args = parser.parse_args()
-    
-    # try to get the keyword path from args 
-    try: 
-        keyword_path = args.keyword_path[0] 
-    except: 
-        pass
-    
-    output_path = args.output_path[0] # output file path 
-    
-    # check to make sure the output file path dirs exist & create them if they dont 
-    if '/' in output_path or '\\' in output_path and not osp.isdir(output_path):
-        os.makedirs(osp.dirname(output_path), exist_ok=True)
-    
-    # get keywords file or use default keywords 
-    try: 
-        with open(keyword_path, 'r') as f:
-            keywords = [word.rstrip('\n') for word in f.readlines()]
-    except: 
-        print(f'Warning: Cannot find keywords file or no filepath given, using default keywords instead.')
-        keywords = ['covid', 'covid-19', 'pfizer', 'moderna', 'astrazeneca', 'johnson & johnson', 
-                    'vaccination', 'vaccine', 'coronavirus', 'sars-cov-2']
+    if tweet._json['user']['location']:
+        location = tweet._json['user']['location']
+        for loc in locations:
+            if re.search(loc, location, re.IGNORECASE):
+                return loc.lower()
 
-    # authenticate 
-    auth = tweepy.OAuthHandler(API_KEY, API_KEY_SECRET)
-    api = tweepy.API(auth, wait_on_rate_limit=True)
-    
-    i = 0 # count the number of valid tweets 
-    used_tweets = {} # used to check if a tweet is unique 
-    with open(output_path, 'w+') as out: 
-        while i < 1000: 
-            keys, query = build_query(keywords)
-            print(f'Searching with keywords : {keys}')
-            
-            # only get 250 tweets at a time, prevents us from hitting the rate limit too quickly 
-            tweets = tweepy.Cursor(api.search_tweets, q=query, 
-                                    lang='en', result_type='recent', 
-                                    tweet_mode='extended', count=250).items() 
-
-            for j, tweet in enumerate(tweets):
-                #location = get_location(tweet)
-                #if location: # only grab tweets that have a valid location aka are in canada 
-                
-                t = {} # dict to hold tweet info 
-                
-                id = tweet._json['id']
-                text = full_text(tweet).replace('\n', '\t') # replace newlines with tabs 
-                hashed_text = hash(text) # hash the tweet txt
-                created_at = tweet._json['created_at'] 
-                                        
-                if hashed_text not in used_tweets.keys() and 'Nov 26' in created_at: # get only unique tweets - ids do not uniquely id the text 
-                    used_tweets[hashed_text] = 1 # add current tweet to used 
-                    
-                    # add standard tweet info 
-                    t['id'] = id
-                    t['created_at'] = created_at
-                    
-                    # add places for topic and sentiment to be added later during manual annotation
-                    t['topic'] = '<TOPIC>'
-                    t['sentiment'] = '<SENTIMENT>'
-                    
-                    # add the tweet text 
-                    t['text'] = text
-
-                    # check for a retweet, include its url if it exists else leave empty 
-                    retweet = True if 'retweeted_status' in tweet._json else False
-                    url = 'https://twitter.com/twitter/statuses/' + str(id)
-                    if retweet:
-                        t['retweet'] = url
-                    else:
-                        t['retweet'] = ''
-                    
-                    if i > 1000: 
-                        break 
-                    
-                    out.write(json.dumps(t)+'\n') # write a tweet to the out file 
-                    i += 1 # counts only the unique tweets w relevant locations 
-                
-                    if j >= 250: # max of 250 tweets for each 10 randomly selected keywords 
-                        break # out of for loop, not while
-                    
-    out.close()
-    
+    return None
         
 if __name__ == '__main__':
     main()
-

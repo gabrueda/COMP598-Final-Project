@@ -34,15 +34,16 @@ options:
   -h, --help       show this help message and exit
   -k KEYWORD_PATH  <keywords.csv> (optional)
   -o OUTPUT_PATH   <output.json> (optional)
+  -d DATE DATE     <2021-11-25> <'Nov 24'>
 ```
 
 **Example Usage:** (from root)
 
 ```
-python3 src/tweet_collection.py -k data/keywords.csv -o data/tweets.json
+python3 src/tweet_collection.py -k data/keywords.csv -o data/tweets.json -d 2021-11-25 'Nov 24'
 ```
 
-The file _tweet_collection.py_ collects 1000 unique tweets, which can take a while due to the Twitter API's rate limit. It will sleep automatically and continue collecting tweets until it reaches 1000 tweets.
+The file _tweet_collection.py_ collects 1000 unique tweets, which can take a while due to the Twitter API's rate limit. It will sleep automatically and continue collecting tweets until it reaches 1000 tweets. The first date in format(YYYY-MM-DD) represents until which day you want to collect tweets. Twitter API only allows to query 7 days prior so the range is (7 days prior - specified date) and the second date in format (MMM DD) represents for which exact date you want to collect.
 
 ### json_to_csv.py
 
