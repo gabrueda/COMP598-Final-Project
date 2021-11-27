@@ -51,7 +51,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()  
     parser.add_argument('-k', '--keywords_path', help='<keywords.csv> (optional)', default=None)
     parser.add_argument('-o', '--output_file_path', help='<output.json> (optional)', default=['data/output.json'])
-    parser.add_argument('-d', '--date', nargs=2, help='2021-11-25 Nov 25', default=['2021-11-25', 'Nov 25'])
+    parser.add_argument('-d', '--date', nargs=2, help='2021-11-25 Nov 24', default=['2021-11-25', 'Nov 25'])
     return parser.parse_args()
 
 # get keywords file or use default keywords 
@@ -74,41 +74,34 @@ def collect_tweets(keywords, output_path, date):
     
     keys, query = build_query(keywords)
     print(f'Searching with keywords : {keys}')
-    
-    while i < 1000:
-        for tweet in tweepy.Cursor(api.search_tweets, q=query, lang='en', 
-                                    result_type='recent', tweet_mode='extended',
-                                    until=date[0]).items():
-            # check if tweet has valid location
-            location = get_location(tweet)
-            date_tweet = tweet._json['created_at']
-            if location and date[1] in date_tweet:
-                text = full_text(tweet).replace('\n', '\t')
-                if hash(text) not in used_tweets:
-                    t = {}                                                                  # dict to hold tweet info 
-                    t['id'] = tweet._json['id']
-                    t['text'] = text                                
-                    t['created_at'] = date_tweet
-                    t['topic'] = '<TOPIC>'
-                    t['sentiment'] = '<SENTIMENT>'
-                    t['retweet'] = True if 'retweeted_status' in tweet._json else False
-                    t['url'] = 'https://twitter.com/twitter/statuses/' + str(t['id'])
-                    t['location'] = location
 
-                    with open(output_path, 'a+') as out:
-                        out.write(json.dumps(t)+'\n')                                       # write a tweet to output file 
+    for tweet in tweepy.Cursor(api.search_tweets, q=query, lang='en', 
+                                    tweet_mode='extended', until=date[0]).items():
+        # check if tweet has valid location
+        location = get_location(tweet)
+        date_tweet = tweet._json['created_at']
+        if location and  date[1] in date_tweet:
+            text = full_text(tweet).replace('\n', '\t')
+            if hash(text) not in used_tweets:
+                t = {}                                          # dict to hold tweet info 
+                t['id'] = tweet._json['id']
+                t['text'] = text                                
+                t['created_at'] = tweet._json['created_at']
+                t['topic'] = '<TOPIC>'
+                t['sentiment'] = '<SENTIMENT>'
+                t['retweet'] = True if 'retweeted_status' in tweet._json else False
+                t['url'] = 'https://twitter.com/twitter/statuses/' + str(t['id'])
+                t['location'] = location
+
+                with open(output_path, 'a+') as out:
+                    out.write(json.dumps(t)+'\n')               # write a tweet to output file 
                         
-                    used_tweets.append(hash(text))
-                    i += 1
-
-            # get different keywords for each 250 tweets collected
-            if i % 250 == 0 and i != 0:
-                keys, query = build_query(keywords)
-                print(f'Searching with keywords : {keys}')
-                break
-            
-            if i == 1000:
-                break
+                used_tweets.append(hash(text))
+                i += 1
+                print(i)
+        
+        if i == 1000:
+            break 
         
 # builds a query string (word OR word OR...) by randomly selecting 10 keywords from the keywords file
 def build_query(keywords):
