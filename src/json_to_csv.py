@@ -21,13 +21,12 @@ def load_json(input_file):
     data = []
     for line in lines:
         record = json.loads(line)
-        record['link'] = 'https://twitter.com/twitter/statuses/' + str(record['id'])
         data.append(record)
 
     return pandas.DataFrame(data)
 
 def write_to_csv(data, output_file):
-    columns_names = ['id', 'link', 'text', 'topic', 'sentiment', 'created_at', 'retweet']
+    columns_names = ['id', 'url', 'text', 'topic', 'sentiment', 'created_at', 'retweet']
     data = data.reindex(columns=columns_names)
     data.to_csv(output_file, index=False)
     
