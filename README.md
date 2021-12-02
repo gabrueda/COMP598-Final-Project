@@ -1,17 +1,24 @@
 # Understanding Discussions Around COVID-19 and Vaccination Hesitancy in Canada
 Final Project for COMP 598 - Fall 2021 at McGill University
 
-Project made by [Nathalie Redick](https://github.com/nredick), [Gabriela Rueda](https://github.com/gabrueda), and [Yusen Tang](https://github.com/).
+Project made by [Nathalie Redick](https://github.com/nredick), [Gabriela Rueda](https://github.com/gabrueda), and [Yusen Tang](https://github.com/TeachFakerPlayingMid).
 
 ## Project Description
 
-This project uses the [Twitter API](https://developer.twitter.com/en/docs/twitter-api) via [tweepy](https://www.tweepy.org) to gather recent Tweets based on keywords related to COVID-19 and COVID-19 vaccine hesitancy. The tweets are filtered geographically to select for those posted in Canada. For 3 days, 1000 tweets were collected each day based on a random selection of 10 keywords. 333 tweets were sampled from each day and used in a final dataset of 1000 tweets, which were manually annotated for sentiment and topic. 
+This project uses the [Twitter API](https://developer.twitter.com/en/docs/twitter-api) via [`tweepy`](https://www.tweepy.org) to gather recent Tweets based on keywords related to COVID-19 and COVID-19 vaccine hesitancy. The tweets are filtered geographically to select for those posted in Canada. For 3 days, 1000 tweets were collected each day based on a random selection of 10 keywords. 333 tweets were sampled from each day and used in a final dataset of 1000 tweets, which were manually annotated for sentiment and topic. 
 
 Tweet data collected by _tweet_collection.py_ is stored in a json file, and each tweet has the following associated data: _id, created_at, location, text,_ and _retweet_. 
 
 ## Usage 
 
 **Clone this repository.**
+
+* Recommended to use a virtual environment, which can be set up as follows: 
+
+```
+python3 -m venv <name of virtual environment>
+source <name of virtual environment>/bin/activate
+```
 
 **Install requirements:** 
 
@@ -20,7 +27,7 @@ pip install -r requirements.txt
 ```
 
 **Environment Variable Set-Up:** 
-Environment variables are handled by _[python-dotenv](https://pypi.org/project/python-dotenv/)_
+Environment variables are handled by `[python-dotenv](https://pypi.org/project/python-dotenv/)`
 
 ## Scripts
 
@@ -48,7 +55,7 @@ The file _tweet_collection.py_ collects 1000 unique tweets, which can take a whi
 ### json_to_csv.py
 
 This script will convert a json file (with a json object in each line) into a csv file.
-This script assumes the fields '['id', 'text', 'topic', 'sentiment', 'created_at', 'retweet'] are present for each record.
+This script assumes the fields `['id', 'text', 'topic', 'sentiment', 'created_at', 'retweet']` are present for each record.
 ```
 usage: json_to_csv.py -i INPUT_PATH -o OUTPUT_PATH
 
@@ -63,6 +70,26 @@ options:
 python3 src/json_to_csv.py -i data/sampled.json -o data/sampled.csv
 ```
 
+### sample_tweets.py
+
+This script randomly samples 333 tweets from each of three input files and 1 extra from one randomly selected file for a total of 1000 tweets over three days. It takes as input three json files and returns a single json file.
+
+```
+usage: sample_tweets.py [-h] -i INPUT_FILE1 INPUT_FILE2 INPUT_FILE3
+                        [-o OUTPUT_PATH]
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT_FILE1 INPUT_FILE2 INPUT_FILE3
+  -o OUTPUT_PATH        <sampled.json> (optional)
+```
+
+**Example Usage:** (from root)
+
+```
+python3 src/sample_tweets.py -i data/tweets_2021-11-22-location.json data/tweets_2021-11-24-location.json data/tweets_2021-11-26-location.json -o final_tweets.json
+```
+
 ## Repository Structure
 
 ```
@@ -70,11 +97,19 @@ python3 src/json_to_csv.py -i data/sampled.json -o data/sampled.csv
 ├── COMP 598 Final Project - Data Science Project.pdf
 ├── README.md
 ├── data
+│   ├── final_tweets.csv
+│   ├── final_tweets.json
 │   ├── keywords-quoted.csv
 │   ├── keywords.csv
-│   ├── tweets-1.json
-│   └── tweets-2.json
+│   ├── sampled.csv
+│   ├── sampled.json
+│   ├── topics_key.csv
+│   ├── tweets-2021-11-22-location.json
+│   ├── tweets-2021-11-24-location.json
+│   └── tweets-2021-11-26-location.json
 ├── requirements.txt
 └── src
+    ├── json_to_csv.py
+    ├── sample_tweets.py
     └── tweet_collection.py
 ```
