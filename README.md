@@ -13,7 +13,7 @@ Tweet data collected by `tweet_collection.py` is stored in a json file, and each
 
 **Clone this repository.**
 
-* Recommended to use a virtual environment, which can be set up as follows: 
+**Recommended to use a virtual environment:**
 
 ```
 python3 -m venv <name of virtual environment>
@@ -27,6 +27,7 @@ pip install -r requirements.txt
 ```
 
 **Environment Variable Set-Up:** 
+
 Environment variables are handled by [`python-dotenv`](https://pypi.org/project/python-dotenv/)
 
 ## Scripts
