@@ -7,7 +7,7 @@ Project made by [Nathalie Redick](https://github.com/nredick), [Gabriela Rueda](
 
 This project uses the [Twitter API](https://developer.twitter.com/en/docs/twitter-api) via [`tweepy`](https://www.tweepy.org) to gather recent Tweets based on keywords related to COVID-19 and COVID-19 vaccine hesitancy. The tweets are filtered geographically to select for those posted in Canada. For 3 days, 1000 tweets were collected each day based on a random selection of 10 keywords. 333 tweets were sampled from each day and used in a final dataset of 1000 tweets, which were manually annotated for sentiment and topic. 
 
-Tweet data collected by _tweet_collection.py_ is stored in a json file, and each tweet has the following associated data: _id, created_at, location, text,_ and _retweet_. 
+Tweet data collected by `tweet_collection.py` is stored in a json file, and each tweet has the following associated data: _id, created_at, location, text,_ and _retweet_. 
 
 ## Usage 
 
@@ -27,12 +27,12 @@ pip install -r requirements.txt
 ```
 
 **Environment Variable Set-Up:** 
-Environment variables are handled by `[python-dotenv](https://pypi.org/project/python-dotenv/)`
+Environment variables are handled by [`python-dotenv`](https://pypi.org/project/python-dotenv/)
 
 ## Scripts
 
 ### tweet_collection.py
-A Twitter Developer Account with Elevated access is necessary to run the code. The API key and API key secret should be stored in a _.env_ file (see _.env_template_).
+A Twitter Developer Account with Elevated access is necessary to run the code. The API key and API key secret should be stored in a `.env` file (see `.env_template`).
 
 ```
 usage: tweet_collection.py [-h] [-k KEYWORD_PATH] [-o OUTPUT_PATH]
@@ -50,7 +50,7 @@ options:
 python3 src/tweet_collection.py -k data/keywords.csv -o data/tweets.json -d 2021-11-25 'Nov 24'
 ```
 
-The file _tweet_collection.py_ collects 1000 unique tweets, which can take a while due to the Twitter API's rate limit. It will sleep automatically and continue collecting tweets until it reaches 1000 tweets. The first date in format(YYYY-MM-DD) represents until which day you want to collect tweets. Twitter API only allows to query 7 days prior so the range is (7 days prior - specified date) and the second date in format (MMM DD) represents for which exact date you want to collect.
+The file `tweet_collection.py` collects 1000 unique tweets, which can take a while due to the Twitter API's rate limit. It will sleep automatically and continue collecting tweets until it reaches 1000 tweets. The first date in format(YYYY-MM-DD) represents until which day you want to collect tweets. Twitter API only allows to query 7 days prior so the range is (7 days prior - specified date) and the second date in format (MMM DD) represents for which exact date you want to collect.
 
 ### json_to_csv.py
 
