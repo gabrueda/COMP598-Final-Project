@@ -123,7 +123,7 @@ def create_tfidf_plots(counts, num_words, topics_key):
         else: 
             title = titles[topic]
             
-        plt.plot(x, y, 'go')
+        plt.plot(x, y, color='black', marker='o', linestyle='None')
         plt.ylabel(f'TF-IDF')
         plt.title(f'Top {num_words} Words by TF-IDF in {title}')
         plt.grid(visible=True, axis='both')
@@ -156,7 +156,7 @@ def plot_word_freq(counts, num_words, topics_key):
         else: 
             title = titles[topic]
             
-        plt.plot(x, y, 'go')
+        plt.plot(x, y, color='black', marker='o', linestyle='None')
         plt.ylabel(f'Number of Word Occurences')
         plt.title(f'Word Frequency in {title} for the Top {num_words} Occurences')
         plt.grid(visible=True, axis='both')
