@@ -1,9 +1,37 @@
 {
-    "Other": 0.14014014014014015,
-    "Vaccine Discussion": 0.33433433433433435,
-    "Information": 0.25125125125125125,
-    "Covid Impact": 0.031031031031031032,
-    "Mandate Opinion": 0.0990990990990991,
-    "Child Vaccinations": 0.1041041041041041,
-    "Political Opinion": 0.04004004004004004
+    "Other": {
+        "neutral": 103,
+        "negative": 26,
+        "positive": 11
+    },
+    "Vaccine Discussion": {
+        "neutral": 213,
+        "negative": 83,
+        "positive": 38
+    },
+    "Information": {
+        "neutral": 233,
+        "negative": 13,
+        "positive": 5
+    },
+    "Covid Impact": {
+        "negative": 16,
+        "neutral": 14,
+        "positive": 1
+    },
+    "Mandate Opinion": {
+        "negative": 53,
+        "neutral": 34,
+        "positive": 12
+    },
+    "Child Vaccinations": {
+        "neutral": 77,
+        "positive": 21,
+        "negative": 6
+    },
+    "Political Opinion": {
+        "negative": 20,
+        "neutral": 17,
+        "positive": 3
+    }
 }

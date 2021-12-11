@@ -106,7 +106,7 @@ def main():
     freqs = freq_by_topic(tweets, topics_key)  
     plot_engagement(freqs)
     
-    with open(osp.join(parentdir, 'data', 'analysis_sentiment.json'), 'w+') as out:
+    with open(osp.join(parentdir, 'data', 'analysis_engagement.json'), 'w+') as out:
         out.write(json.dumps(freqs, indent=4))  
 
 

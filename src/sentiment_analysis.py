@@ -97,7 +97,7 @@ def main():
        
     s = get_sentiments(tweets, topics_key)
     plot_sentiment(s)
-    
+    print(s)
     with open(osp.join(parentdir, 'data', 'analysis_sentiment.json'), 'w+') as out:
         out.write(json.dumps(s, indent=4))   
        
