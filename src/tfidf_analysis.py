@@ -25,9 +25,10 @@ sys.path.append(parentdir)
 # function to parse input args 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_file', help='<final_tweets.csv>', required=True, nargs=1)
+    parser.add_argument('-i', '--input_file', help='<final_tweets_annotated.csv>', required=True, nargs=1)
     parser.add_argument('-k', '--keywords_file', help='<keywords.csv>', required=False, nargs=1)
     parser.add_argument('-t', '--topics_key', help='<topics_key.csv>', required=False, nargs=1)
+    #parser.add_argument('-o', '--output_file', help='<output_file.json>', required=False, nargs=1, default=osp.join(parentdir, 'tfidf.json'))
     args = parser.parse_args()
     return args
 
@@ -102,28 +103,72 @@ def tfidf_per_word(topic, counts, num_words):
     return x, y
 
 
-def create_plots(counts, num_words, topics_key):
-    titles = {sr.code : sr.topic.title() for _, sr in topics_key.iterrows()}
+def create_tfidf_plots(counts, num_words, topics_key):
+    if not topics_key.empty: 
+        titles = {sr.code : sr.topic.title() for _, sr in topics_key.iterrows()}
+    
     plt.figure(figsize=(6, 5))
     outpath = osp.join(parentdir, 'data', 'figures')
+    
     try:
         os.makedirs(outpath, exist_ok=True)
     except:
         pass
+    
     for topic, count in counts.items():
-        x, y = tfidf_per_word(topic, counts, num_words) 
-        title = titles[topic]
+        x, y = tfidf_per_word(topic, counts, num_words)
+        
+        if topics_key.empty:  
+            title = topic
+        else: 
+            title = titles[topic]
+            
         plt.plot(x, y, 'go')
         plt.ylabel(f'TF-IDF')
         plt.title(f'Top {num_words} Words by TF-IDF in {title}')
         plt.grid(visible=True, axis='both')
         plt.xticks(rotation=45)        
-        plt.savefig(osp.join(outpath, f'fig_{topic}.png'), dpi=300, format='png', bbox_inches='tight')
+        plt.savefig(osp.join(outpath, f'tfidf_{topic}.png'), dpi=300, format='png', bbox_inches='tight')
         plt.clf()        
+        
+        
+def plot_word_freq(counts, num_words, topics_key):
+    if not topics_key.empty: 
+        titles = {sr.code : sr.topic.title() for _, sr in topics_key.iterrows()}
+    
+    
+    plt.figure(figsize=(6, 5))
+    outpath = osp.join(parentdir, 'data', 'figures')
+    
+    try:
+        os.makedirs(outpath, exist_ok=True)
+    except:
+        pass
+    
+    
+    for topic, count in counts.items():
+        sorted_count = sorted(count, key=count.get) # sort the keys by their num occurences
+        x = list(reversed(sorted_count))[:min(len(sorted_count), num_words)] # get top num words occurrences 
+        y = [count[w] for w in x]   
+              
+        if topics_key.empty:  
+            title = topic
+        else: 
+            title = titles[topic]
+            
+        plt.plot(x, y, 'go')
+        plt.ylabel(f'Number of Word Occurences')
+        plt.title(f'Word Frequency in {title} for the Top {num_words} Occurences')
+        plt.grid(visible=True, axis='both')
+        plt.xticks(rotation=45)        
+        plt.savefig(osp.join(outpath, f'freq_{topic}.png'), dpi=300, format='png', bbox_inches='tight')
+        plt.clf() 
+
 
 def main():
     args = parse_arguments()
-    input_file = args.input_file[0] # get the annotated tweets from input 
+    input_file = args.input_file[0] # get the annotated tweets from input
+    #output_file = args.output_file[0] 
     
     with open(input_file, 'r+') as f: 
         df = pd.read_csv(f) # load tweets into a pandas df 
@@ -143,13 +188,19 @@ def main():
     
 
     counts = {topic: topic_word_counts(topic, df, stopwords=get_stopwords(keywords)) for topic in df.topic.unique()}
-    #tfidf = {topic : tfidf_per_word(topic, counts, num_words=10) for topic in df.topic.unique()}
     
-    #for topic in df.topic.unique() 
+    tfidf = {}
+    for topic in df.topic.unique():
+        x, y = tfidf_per_word(topic, counts, num_words=10) 
+        z = dict(zip(x, y))
+        tfidf[topic] = z
+        
+    # write top ten words/topic and their tfidf scores to a json file 
+    with open(osp.join(parentdir, 'data', 'analysis_tfidf.json'), 'w+') as out:
+        out.write(json.dumps(tfidf, indent=4))   
     
-    #print(json.dumps(tfidf, indent=2))
-    
-    create_plots(counts, 10, topics_key)
+    create_tfidf_plots(counts, 10, topics_key)
+    plot_word_freq(counts, 10, topics_key)
 
 if __name__ == '__main__':
     main()
