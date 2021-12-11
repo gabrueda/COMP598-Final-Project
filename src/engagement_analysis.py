@@ -55,7 +55,7 @@ def plot_engagement(freqs):
     
     # args 
     explode = [(1/freq)*0.005 for freq in y]
-    colors = ('#99d98c', '#76c893', '#52b69a', '#34a0a4', '#168aad', '#1a759f', '#1e6091')
+    colors = ('#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF')
     # Creating autocpt arguments
     def func(pct, allvalues):
         absolute = int(pct/100.*np.sum(allvalues))
