@@ -79,7 +79,7 @@ def tf(w, topic, counts):
 
 
 def idf(w, counts): 
-    num_docs = 1000
+    num_docs = 7
     # check to see which topics used word w
     usages = 0
     for topic, freq_dict in counts.items():
