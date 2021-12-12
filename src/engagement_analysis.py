@@ -48,7 +48,7 @@ def retweeted_by_topic(tweets, topics_key):
         titles = {sr.code : sr.topic.title() for _, sr in topics_key.iterrows()}
         return {titles[topic] : int((tweets.loc[((tweets['retweet'] == True) & (tweets['topic'] == topic))]).size)/int(tweets[tweets['topic'] == topic].size) for topic in tweets.topic.unique()}
     else:
-        return {topic : int((tweets.loc[((tweets['retweet'] == True) & (tweets['topic'] == topic))]).size)/tweets.topic.size for topic in tweets.topic.unique()}
+        return {topic : int((tweets.loc[((tweets['retweet'] == True) & (tweets['topic'] == topic))]).size)/int(tweets[tweets['topic'] == topic].size) for topic in tweets.topic.unique()}
      
 
 # plot the engagement 
