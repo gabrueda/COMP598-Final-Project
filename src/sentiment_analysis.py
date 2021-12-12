@@ -52,7 +52,6 @@ def plot_sentiment(s):
     
     width = 0.75 # the width of the bars
     topics = s.keys()
-    num_s = len(s.keys())
 
     pos = []
     neg = []
